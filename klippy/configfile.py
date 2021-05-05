@@ -3,7 +3,8 @@
 # Copyright (C) 2016-2021  Kevin O'Connor <kevin@koconnor.net>
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
-import os, glob, re, time, logging, ConfigParser as configparser, StringIO
+import os, glob, re, time, logging, configparser
+from io import StringIO
 
 error = configparser.Error
 
@@ -107,7 +108,7 @@ class PrinterConfig:
     def _read_config_file(self, filename):
         try:
             f = open(filename, 'rb')
-            data = f.read()
+            data = f.read().decode()
             f.close()
         except:
             msg = "Unable to open config file %s" % (filename,)
@@ -167,7 +168,7 @@ class PrinterConfig:
             return
         data = '\n'.join(buffer)
         del buffer[:]
-        sbuffer = StringIO.StringIO(data)
+        sbuffer = StringIO(data)
         fileconfig.readfp(sbuffer, filename)
     def _resolve_include(self, source_filename, include_spec, fileconfig,
                          visited):

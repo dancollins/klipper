@@ -65,6 +65,7 @@ class MCU_stepper:
         self._min_stop_interval = second_last_step_time - last_step_time
     def setup_itersolve(self, alloc_func, *params):
         ffi_main, ffi_lib = chelper.get_ffi()
+        params = (x.encode() for x in params)
         sk = ffi_main.gc(getattr(ffi_lib, alloc_func)(*params), ffi_lib.free)
         self.set_stepper_kinematics(sk)
     def _build_config(self):

@@ -540,7 +540,7 @@ class MCU:
             for i, cmd in enumerate(cmdlist):
                 cmdlist[i] = pin_resolver.update_command(cmd)
         # Calculate config CRC
-        config_crc = zlib.crc32('\n'.join(self._config_cmds)) & 0xffffffff
+        config_crc = zlib.crc32('\n'.join(self._config_cmds).encode()) & 0xffffffff
         self.add_config_cmd("finalize_config crc=%d" % (config_crc,))
         if prev_crc is not None and config_crc != prev_crc:
             self._check_restart("CRC mismatch")
@@ -816,8 +816,11 @@ class MCU:
     def stats(self, eventtime):
         load = "mcu_awake=%.03f mcu_task_avg=%.06f mcu_task_stddev=%.06f" % (
             self._mcu_tick_awake, self._mcu_tick_avg, self._mcu_tick_stddev)
-        stats = ' '.join([load, self._serial.stats(eventtime),
-                          self._clocksync.stats(eventtime)])
+
+        l = [load, self._serial.stats(eventtime).decode(), self._clocksync.stats(eventtime)]
+        print ([(x, type(x)) for x in l])
+
+        stats = ' '.join(l)
         parts = [s.split('=', 1) for s in stats.split()]
         last_stats = {k:(float(v) if '.' in v else int(v)) for k, v in parts}
         self._get_status_info['last_stats'] = last_stats

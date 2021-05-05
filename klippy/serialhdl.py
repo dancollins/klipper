@@ -58,7 +58,7 @@ class SerialReader:
                 logging.exception("Exception in serial callback")
     def _get_identify_data(self, eventtime):
         # Query the "data dictionary" from the micro-controller
-        identify_data = ""
+        identify_data = b''
         while 1:
             msg = "identify offset=%d count=%d" % (len(identify_data), 40)
             try:
@@ -72,7 +72,7 @@ class SerialReader:
                     # Done
                     return identify_data
                 identify_data += msgdata
-    def _start_session(self, serial_dev, serial_fd_type='u', client_id=0):
+    def _start_session(self, serial_dev, serial_fd_type=b'u', client_id=0):
         self.serial_dev = serial_dev
         self.serialqueue = self.ffi_main.gc(
             self.ffi_lib.serialqueue_alloc(serial_dev.fileno(),
@@ -328,7 +328,7 @@ def stk500v2_leave(ser, reactor):
     ser.baudrate = 115200
     reactor.pause(reactor.monotonic() + 0.100)
     ser.read(4096)
-    ser.write('\x1b\x01\x00\x01\x0e\x11\x04')
+    ser.write(b'\x1b\x01\x00\x01\x0e\x11\x04')
     reactor.pause(reactor.monotonic() + 0.050)
     res = ser.read(4096)
     logging.debug("Got %s from stk500v2", repr(res))
